@@ -3,6 +3,10 @@ import numpy as np
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras.utils import to_categorical
+from keras.layers import Dropout
+from keras.models import Sequential
+from sklearn.model_selection import train_test_split
+import matplotlib.pyplot as plt
 import random
 
 
@@ -14,8 +18,8 @@ tf.random.set_seed(1618)
 #tf.logging.set_verbosity(tf.logging.ERROR)   # Uncomment for TF1.
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
-ALGORITHM = "guesser"
-#ALGORITHM = "tf_net"
+#ALGORITHM = "guesser"
+ALGORITHM = "tf_net"
 #ALGORITHM = "tf_conv"
 
 DATASET = "mnist_d"
@@ -37,11 +41,23 @@ elif DATASET == "mnist_f":
     IZ = 1
     IS = 784
 elif DATASET == "cifar_10":
-    pass                                 # TODO: Add this case.
+    NUM_CLASSES = 10
+    IH = 32
+    IW = 32
+    IZ = 3
+    IS = 784                  # TODO: Add this case.
 elif DATASET == "cifar_100_f":
-    pass                                 # TODO: Add this case.
+    NUM_CLASSES = 20
+    IH = 32
+    IW = 32
+    IZ = 3
+    IS = 784                                 # TODO: Add this case.
 elif DATASET == "cifar_100_c":
-    pass                                 # TODO: Add this case.
+    NUM_CLASSES = 100
+    IH = 32
+    IW = 32
+    IZ = 3
+    IS = 784                                 # TODO: Add this case.
 
 
 #=========================<Classifier Functions>================================
@@ -55,15 +71,58 @@ def guesserClassifier(xTest):
     return np.array(ans)
 
 
-def buildTFNeuralNet(x, y, eps = 6):
-    pass        #TODO: Implement a standard ANN here.
-    return None
+def buildTFNeuralNet(x, y, eps = 10):
+        print("Building and training TF_NN.")
+        model = tf.keras.models.Sequential([tf.keras.layers.Flatten(), tf.keras.layers.Dense(256, activation=tf.nn.relu), tf.keras.layers.Dense(10, activation=tf.nn.softmax)])
+        model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+        history = model.fit(x, y, epochs = eps)
+        plt.plot(history.history['accuracy'])
+        #plt.plot(epochs, loss_val, 'b', label='validation accuracy')
+        plt.title('Accuracy Plot')
+        plt.xlabel('Epochs')
+        plt.ylabel('Accuracy')
+        plt.legend()
+        plt.show()
+        plt.savefig('ANN_Accuracy_Plot.pdf')
 
+                         #TODO: Write code to build and train your keras neural net.
+        return model
 
-def buildTFConvNet(x, y, eps = 10, dropout = True, dropRate = 0.2):
-    pass        #TODO: Implement a CNN here. dropout option is required.
-    return None
+def buildTFConvNet(x, y, eps = 50, dropout = True, dropRate = 0.25):
+    model = keras.Sequential();
 
+    inShape = (IH, IW, IZ)
+    lostType = keras.losses.categorical_crossentropy
+    opt = tf.optimizers.Adam()
+    model.add(keras.layers.Conv2D(32, kernel_size = (3, 3), activation = "relu", input_shape = inShape))
+    model.add(keras.layers.Conv2D(64, kernel_size = (3, 3), activation = "relu"))
+
+    model.add(keras.layers.MaxPooling2D(pool_size = (2, 2)))
+    model.add(keras.layers.BatchNormalization())
+    model.add(keras.layers.Conv2D(64, kernel_size = (3, 3), activation = "relu"))
+    model.add(keras.layers.Conv2D(64, kernel_size = (3, 3), activation = "relu"))
+    model.add(keras.layers.MaxPooling2D(pool_size = (2, 2)))
+    model.add(keras.layers.BatchNormalization())
+    model.add(keras.layers.Conv2D(64, kernel_size = (3, 3), activation = "relu"))
+    model.add(keras.layers.MaxPooling2D(pool_size = (2, 2)))
+    model.add(keras.layers.BatchNormalization())
+    model.add(keras.layers.Dropout(dropRate))
+    model.add(keras.layers.Flatten())
+    model.add(keras.layers.Dense(512, activation = "relu"))
+    model.add(keras.layers.Dense(NUM_CLASSES, activation = "softmax"))
+
+    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+    history = model.fit(x, y, epochs = eps)
+    plt.plot(history.history['accuracy'])
+    #plt.plot(epochs, loss_val, 'b', label='validation accuracy')
+    plt.title('Accuracy Plot')
+    plt.xlabel('Epochs')
+    plt.ylabel('Accuracy')
+    plt.legend()
+    plt.show()
+    plt.savefig('CNN_Accuracy_Plot.pdf')
+           #TODO: Implement a CNN here. dropout option is required.
+    return model
 #=========================<Pipeline Functions>==================================
 
 def getRawData():
@@ -73,12 +132,19 @@ def getRawData():
     elif DATASET == "mnist_f":
         mnist = tf.keras.datasets.fashion_mnist
         (xTrain, yTrain), (xTest, yTest) = mnist.load_data()
+        print(str(xTrain.shape))
     elif DATASET == "cifar_10":
-        pass      # TODO: Add this case.
+        cifar = tf.keras.datasets.cifar10
+        (xTrain, yTrain), (xTest, yTest) = cifar.load_data()
+        print(str(xTrain.shape))
     elif DATASET == "cifar_100_f":
-        pass      # TODO: Add this case.
+        cifar = tf.keras.datasets.cifar100.load_data(label_mode='coarse')
+        (xTrain, yTrain), (xTest, yTest) = cifar
+        print(str(xTrain.shape))
     elif DATASET == "cifar_100_c":
-        pass      # TODO: Add this case.
+        cifar = tf.keras.datasets.cifar100.load_data(label_mode='fine')
+        (xTrain, yTrain), (xTest, yTest) = cifar
+        print(str(xTrain.shape))
     else:
         raise ValueError("Dataset not recognized.")
     print("Dataset: %s" % DATASET)
@@ -93,6 +159,7 @@ def getRawData():
 def preprocessData(raw):
     ((xTrain, yTrain), (xTest, yTest)) = raw
     if ALGORITHM != "tf_conv":
+        print("we are here")
         xTrainP = xTrain.reshape((xTrain.shape[0], IS))
         xTestP = xTest.reshape((xTest.shape[0], IS))
     else:

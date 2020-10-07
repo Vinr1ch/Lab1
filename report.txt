@@ -1,0 +1,97 @@
+Name: Colin Vinarcik
+Purdue email: cvinarci@purdue.edu
+Link to your git repo (make sure we all have access): https://github.com/Vinr1ch/Lab1
+List of resources used (links to websites used)
+This was used as a reference to create the CNN -
+https://missinglink.ai/guides/keras/keras-conv2d-working-cnn-2d-convolutions-keras/
+
+This was use to help with getting different history data points -
+https://stackoverflow.com/questions/39883331/plotting-learning-curve-in-keras-gives-keyerror-val-acc
+
+
+List of parts of the lab completed
+
+[5] Standard ANN (this can be from lab 1).
+[10] CNN
+[10] Get an MNIST digit accuracy of 99% or higher.
+[10] Get an MNIST fashion accuracy of 92% or higher.
+[11] Get a cifar 10 accuracy of 70% or higher.
+[12] Get a cifar 100 course accuracy of 50% or higher. (currently at around 45-47% accuracy)
+[12] Get a cifar 100 fine accuracy of 35% or higher.
+[+3] EC: Have a cifar 100 fine accuracy of 40% or higher.
+[+5] EC: Have a cifar 100 fine accuracy of 45% or higher. ( I believe I'm up to 48%)
+[2] Code the pipeline to be able to use cifar-10
+[2] Code the pipeline to be able to use cifar-100 fine
+[2] Code the pipeline to be able to use cifar-100 course
+[2] Use matplotlib to create a bar graph showing your accuracy with the standard ANN for each dataset. Save this graph as an image and name the file ANN_Accuracy_Plot.pdf.
+[2] Use matplotlib to create a bar graph showing your accuracy with the standard CNN for each dataset. Save this graph as an image and name the file CNN_Accuracy_Plot.pdf.
+[20] Report.
+
+Answer the questions:
+How is a CNN superior to standard ANNs for image processing?
+Cnn is better suited for image data compared to ANN's tabular data need.  This makes
+CNN have parameter sharing, and be able to identify spatial relationships. CNN also
+have pooling of its different filters.  This allows for multiple convolutions append
+poolings.
+
+Why do we sometimes use pooling in CNNs?
+The use of pooling for cnn is to help reduce the amount of parameters and computations
+within in the network.  Each pooling layer work independently on its current map.
+This helps with noise and reduces the image size
+
+Why do you think the cifar datasets are harder than mnist?
+Cifar datasets has a much larger collection of different images, and are used to
+train the network.  mnist is much smaller sample set, with smaller images.  mnist
+has 30000 for training with 16x16 images where as cifar10 has 60000(double that of mnist)
+and are larger images being 32x32 colour
+
+
+
+Explain how you increases the accuracy of your CNN
+I made sure to tune the overfitting and underfitting of the given problem.  This allowed
+for my network to work well with not just the training data but the testing data. My CNN
+also has multiple layers.  I did test with dropout on each layer but, dramatically caused
+accuracy to fall.
+
+Include all hyperparameters
+50 epochs for CNN and 10 for tf_net
+tf_net only has 3 layer
+tf_cnn has 15 separate layers, which includes dropout
+both uses relu as activate function
+
+Include relevant outputs (e.g. confusion matrix, metrics, plots, generated outputs)
+DATASET = "mnist_d"
+Testing TF_NN.
+Classifier algorithm: tf_net
+Classifier accuracy: 94.700000%
+
+DATASET = "mnist_f"
+Testing TF_NN.
+Classifier algorithm: tf_net
+Classifier accuracy: 81.910000%
+
+
+DATASET = "mnist_d"
+Testing TF_CNN.
+Classifier algorithm: tf_conv
+Classifier accuracy: 99.410000%
+
+DATASET = "mnist_f"
+Testing TF_CNN.
+Classifier algorithm: tf_conv
+Classifier accuracy: 92.300000%
+
+ATASET = "cifar_10"
+Testing TF_CNN.
+Classifier algorithm: tf_conv
+Classifier accuracy: 76.390000%
+
+#DATASET = "cifar_100_f"
+Testing TF_CNN.
+Classifier algorithm: tf_conv
+Classifier accuracy: 55.090000%
+
+DATASET = "cifar_100_c"
+Testing TF_CNN.
+Classifier algorithm: tf_conv
+Classifier accuracy: 46.230000%
